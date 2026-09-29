@@ -1,5 +1,5 @@
 {
-    "name": "burhan/laravel-socket-bridge",
+    "name": "socket-bridge/laravel-socketio",
     "description": "Reusable Laravel integration for authenticated Socket.IO events over Redis.",
     "type": "library",
     "license": "MIT",

@@ -9,7 +9,7 @@ under the `node/` directory and is installed with npm.
 ## Installation
 
 ```bash
-composer require burhan/laravel-socket-bridge
+composer require socket-bridge/laravel-socketio
 php artisan vendor:publish --tag=socket-bridge-config
 ```
 
