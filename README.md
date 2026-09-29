@@ -5,15 +5,27 @@ Reusable Laravel integration for authenticated Socket.IO events transported thro
 The package contains the Laravel integration layer. The companion Socket.IO gateway is included
 in the [`node/`](node/) directory and runs as a separate Node.js service.
 
-## How it works
+## Quick start
 
-Clients connect to the Node.js Socket.IO gateway. The gateway uses Redis to communicate with
-Laravel, where authentication and registered socket event handlers are processed. Responses are
-returned to the client through Socket.IO.
+Run these steps in order:
 
-```text
-Socket.IO client <-> Node.js gateway <-> Redis <-> Laravel application
+```bash
+composer require socket-bridge/laravel-socketio
+php artisan vendor:publish --tag=socket-bridge-config
+php artisan socket-bridge:install
 ```
+
+Then:
+
+1. Add the Redis settings shown below to `.env`.
+2. Register `testEvent` in `AppServiceProvider`.
+3. Start Redis and Laravel.
+4. Start the gateway with `php artisan socket-bridge:install --start`.
+5. Connect a Socket.IO client with a valid access token.
+
+`socket-bridge:install` only checks Node.js/npm and installs dependencies. The `--start` option
+runs the gateway in the current terminal. For production, use Supervisor so it starts and
+restarts automatically.
 
 ## Requirements
 
@@ -228,48 +240,6 @@ SOCKET_IO_CORS_ORIGIN=http://localhost:3000
 The Laravel and gateway Redis channel settings must match. If you change the Laravel
 `SOCKET_BRIDGE_*_CHANNEL` values, set the corresponding variables for the Node.js gateway too.
 
-## Gateway configuration
-
-The Node.js gateway authenticates Socket.IO connections through Laravel over Redis and forwards
-events to the registered Laravel handlers.
-
-The gateway accepts either a Redis URL:
-
-```bash
-REDIS_URL=redis://127.0.0.1:6379
-```
-
-or separate Redis settings:
-
-```dotenv
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-REDIS_PASSWORD=
-```
-
-The complete gateway configuration is:
-
-```dotenv
-SOCKET_IO_PORT=6006
-SOCKET_IO_CORS_ORIGIN=http://localhost:3000
-SOCKET_BRIDGE_REQUESTS_CHANNEL=qsfa:socket:requests
-SOCKET_BRIDGE_RESPONSES_CHANNEL=qsfa:socket:responses
-SOCKET_BRIDGE_USER_EVENTS_CHANNEL=qsfa:socket:user-events
-```
-
-Install the gateway dependencies once:
-
-```bash
-cd node
-npm install
-```
-
-Run it locally with:
-
-```bash
-REDIS_URL=redis://127.0.0.1:6379 npm start
-```
-
 ## Run the gateway automatically
 
 For production, use a process manager so the gateway starts on boot and restarts if it exits.
@@ -309,25 +279,6 @@ sudo supervisorctl tail -f socket-bridge-gateway
 
 Do not start the gateway from a Laravel service provider or an HTTP request. It is a long-running
 service and should be monitored independently from PHP.
-
-## Testing
-
-Check PHP syntax:
-
-```bash
-for file in src/*.php config/*.php; do php -l "$file" || exit 1; done
-```
-
-Validate the Composer package:
-
-```bash
-composer validate --strict
-```
-
-Start Redis, Laravel, and the gateway, then connect a Socket.IO client using an access token. The
-client should authenticate successfully and receive responses from the registered Laravel event
-handler. If authentication fails, check the access token, Laravel authentication handling, Redis
-connectivity, and the gateway logs.
 
 ## Troubleshooting
 
