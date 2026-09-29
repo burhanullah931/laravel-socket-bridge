@@ -129,7 +129,40 @@ default Redis URL defined in the configuration file.
 
 ## Registering an event
 
-Register application-specific event handlers through `SocketEventRegistry`:
+The package automatically discovers listener classes in `app/Listeners` whose names start with
+`HandleSocket`.
+
+For example, create `app/Listeners/HandleSocketTestEvent.php`:
+
+```php
+<?php
+
+namespace App\Listeners;
+
+final class HandleSocketTestEvent
+{
+    public function handle(array $payload, int|string $userId): array
+    {
+        return [
+            'message' => 'testEvent received',
+            'user_id' => $userId,
+            'payload' => $payload,
+        ];
+    }
+}
+```
+
+The prefix is removed and the first remaining character is converted to lowercase:
+
+```text
+HandleSocketTestEvent  ->  testEvent
+HandleSocketOrderPaid  ->  orderPaid
+```
+
+Listeners are resolved through Laravel's service container, so constructor dependencies are
+supported. The `handle()` method receives the payload and authenticated user ID.
+
+Manual registration is also supported through `SocketEventRegistry`:
 
 ```php
 use Burhan\SocketBridge\SocketEventRegistry;
@@ -148,9 +181,13 @@ public function boot(SocketEventRegistry $socketEvents): void
 
 The application remains responsible for authorization, payload validation, and business logic.
 
-## Create a test event
+## Test event
 
-Register a simple event in a service provider, such as `AppServiceProvider`:
+The quickest test is to create `app/Listeners/HandleSocketTestEvent.php` using the example above.
+After Laravel starts, the listener is discovered automatically. Emit `testEvent` from the
+Socket.IO client shown below.
+
+Manual registration remains available when you need a custom event name or closure:
 
 ```php
 use Burhan\SocketBridge\SocketEventRegistry;
@@ -183,9 +220,11 @@ The handler receives the event payload and authenticated user ID. Return an arra
 response to the client. Add authorization and payload validation inside the handler or in your
 application's existing authorization layer.
 
-This example is a socket event handler, not a Laravel `ShouldQueue` event/listener pair. Do not
-use `php artisan make:event` or `php artisan make:listener` for this integration; register socket
-events through `SocketEventRegistry` as shown above.
+You do not need `php artisan make:event` or `php artisan make:listener`; those commands create
+Laravel event/listener classes and are not used for socket listener discovery.
+
+Automatic discovery runs when Laravel boots. Restart Laravel and the gateway after adding a new
+listener while the application is running.
 
 ### Test the event
 

@@ -20,6 +20,12 @@ final class SocketBridgeServiceProvider extends ServiceProvider
             __DIR__.'/../config/socket-bridge.php' => config_path('socket-bridge.php'),
         ], 'socket-bridge-config');
 
+        $this->app->make(SocketEventRegistry::class)->discover(
+            $this->app->basePath('app/Listeners'),
+            $this->app->getNamespace().'Listeners',
+            $this->app,
+        );
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 InstallSocketBridgeCommand::class,
