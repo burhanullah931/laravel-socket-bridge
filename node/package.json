@@ -1,0 +1,14 @@
+{
+    "name": "@burhan/socket-bridge-gateway",
+    "version": "0.1.0",
+    "private": false,
+    "type": "module",
+    "description": "Socket.IO gateway for the Laravel Socket Bridge package.",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "redis": "^4.7.0",
+        "socket.io": "^4.8.1"
+    }
+}

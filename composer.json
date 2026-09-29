@@ -1,0 +1,26 @@
+{
+    "name": "burhan/laravel-socket-bridge",
+    "description": "Reusable Laravel integration for authenticated Socket.IO events over Redis.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "illuminate/contracts": ">=10.0",
+        "illuminate/support": ">=10.0",
+        "predis/predis": ">=2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Burhan\\SocketBridge\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Burhan\\SocketBridge\\SocketBridgeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
